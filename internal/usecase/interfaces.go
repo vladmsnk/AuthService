@@ -15,6 +15,6 @@ type (
 
 	AuthRepo interface {
 		SaveUser(ctx context.Context, user entity.User) (uuid.UUID, error)
-		FindUserUserByEmail(ctx context.Context, email string) (entity.User, error)
+		FindUserUserByEmail(ctx context.Context, email string) (entity.User, bool, error)
 	}
 )

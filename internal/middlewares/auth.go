@@ -3,19 +3,20 @@ package middlewares
 import (
 	"auth/vladmsnk/internal/util"
 	"github.com/gin-gonic/gin"
+	"net/http"
 )
 
 func Auth() gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenString := context.GetHeader("Authorization")
 		if tokenString == "" {
-			context.JSON(401, gin.H{"error": "request does not contain an access token"})
+			context.JSON(http.StatusBadRequest, gin.H{"error": "request does not contain an access token"})
 			context.Abort()
 			return
 		}
 		err := util.ValidateToken(tokenString)
 		if err != nil {
-			context.JSON(401, gin.H{"error": err.Error()})
+			context.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			context.Abort()
 			return
 		}

@@ -5,6 +5,8 @@ import (
 	"auth/vladmsnk/pkg/postgres"
 	"context"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
+	"github.com/pkg/errors"
 )
 
 type Repository struct {
@@ -24,12 +26,17 @@ func (r *Repository) SaveUser(ctx context.Context, user entity.User) (uuid.UUID,
 	return user.Id, nil
 }
 
-func (r *Repository) FindUserUserByEmail(ctx context.Context, email string) (entity.User, error) {
+func (r *Repository) FindUserUserByEmail(ctx context.Context, email string) (entity.User, bool, error) {
 	var user entity.User
 
 	err := r.Pool.QueryRow(ctx, FindUserByEmail, email).Scan(&user.Id, &user.Username, &user.Email, &user.PasswordHash, &user.Number)
 	if err != nil {
-		return entity.User{}, err
+		switch {
+		case errors.Is(err, pgx.ErrNoRows):
+			return entity.User{}, false, nil
+		default:
+			return entity.User{}, false, err
+		}
 	}
-	return user, nil
+	return user, true, nil
 }

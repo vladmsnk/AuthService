@@ -4,8 +4,9 @@ import (
 	"auth/vladmsnk/internal/dto"
 	"auth/vladmsnk/internal/util"
 	"context"
+	"errors"
 	"github.com/google/uuid"
-	"github.com/jackc/pgx/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 type AuthUseCase struct {
@@ -21,9 +22,12 @@ func NewAuthUseCase(ar AuthRepo) *AuthUseCase {
 func (uc *AuthUseCase) CreateUser(ctx context.Context,
 	request dto.UserRegisterRequest) (dto.UserRegisterResponse, error) {
 
-	_, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
-	if err != nil && err != pgx.ErrNoRows {
+	_, found, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
+	if err != nil {
 		return dto.UserRegisterResponse{}, err
+	}
+	if err == nil && found {
+		return dto.UserRegisterResponse{}, util.ErrUserAlreadyExists
 	}
 
 	userID := uuid.New()
@@ -44,13 +48,21 @@ func (uc *AuthUseCase) CreateUser(ctx context.Context,
 }
 
 func (uc *AuthUseCase) GenerateToken(ctx context.Context, request dto.UserLoginRequest) (dto.UserLoginResponse, error) {
-	user, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
+	user, found, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
 	if err != nil {
 		return dto.UserLoginResponse{}, err
 	}
+	if err == nil && !found {
+		return dto.UserLoginResponse{}, util.ErrUserNotFound
+	}
 	credErr := util.CheckPassword(request.Password, user.PasswordHash)
 	if credErr != nil {
-		return dto.UserLoginResponse{}, credErr
+		switch {
+		case errors.Is(credErr, bcrypt.ErrMismatchedHashAndPassword):
+			return dto.UserLoginResponse{}, util.ErrInvalidPassword
+		default:
+			return dto.UserLoginResponse{}, err
+		}
 	}
 	tokenString, err := util.GenerateJWT(user.Email, user.Username)
 	if err != nil {

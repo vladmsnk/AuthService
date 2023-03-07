@@ -3,8 +3,9 @@ package v1
 import (
 	"auth/vladmsnk/internal/dto"
 	"auth/vladmsnk/internal/usecase"
+	"auth/vladmsnk/internal/util"
 	"auth/vladmsnk/pkg/logger"
-	"fmt"
+	"errors"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )
@@ -29,11 +30,16 @@ func (a *AuthRoutes) login(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
-
 	response, err := a.t.GenerateToken(ctx, userLoginRequest)
-	fmt.Println(err)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		switch {
+		case errors.Is(err, util.ErrUserNotFound):
+			ctx.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+		case errors.Is(err, util.ErrInvalidPassword):
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
+		default:
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		}
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
@@ -50,7 +56,12 @@ func (a *AuthRoutes) register(ctx *gin.Context) {
 
 	response, err := a.t.CreateUser(ctx, userRegisterRequest)
 	if err != nil {
-		ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		switch {
+		case errors.Is(err, util.ErrUserAlreadyExists):
+			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
+		default:
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+		}
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
