@@ -18,7 +18,7 @@ const (
 
 // Postgres -.
 type Postgres struct {
-	maxPoolSize  int
+	maxPoolSize  int //размер конекшн пула
 	connAttempts int
 	connTimeout  time.Duration
 

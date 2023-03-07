@@ -22,6 +22,7 @@ func newAuthRoutes(handler *gin.RouterGroup, a usecase.Auth, l logger.Interface)
 	handler.POST("/user/register", r.register)
 }
 
+//login endpoint
 func (a *AuthRoutes) login(ctx *gin.Context) {
 	var userLoginRequest dto.UserLoginRequest
 
@@ -30,6 +31,8 @@ func (a *AuthRoutes) login(ctx *gin.Context) {
 		ctx.Abort()
 		return
 	}
+
+	//generate jwt token if user exists and he gave valid credentials
 	response, err := a.t.GenerateToken(ctx, userLoginRequest)
 	if err != nil {
 		switch {
@@ -38,18 +41,28 @@ func (a *AuthRoutes) login(ctx *gin.Context) {
 		case errors.Is(err, util.ErrInvalidPassword):
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 		return
 	}
 	ctx.JSON(http.StatusOK, response)
 }
 
+//registration endpoint
 func (a *AuthRoutes) register(ctx *gin.Context) {
 	var userRegisterRequest dto.UserRegisterRequest
 
+	//json serialization
 	if err := ctx.ShouldBindJSON(&userRegisterRequest); err != nil {
 		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		ctx.Abort()
+		return
+	}
+
+	//email validation
+	_, isValid := util.ValidMailAddress(userRegisterRequest.Email)
+	if !isValid {
+		ctx.JSON(http.StatusBadRequest, gin.H{"error": util.ErrInvalidEmailFormat.Error()})
 		ctx.Abort()
 		return
 	}
@@ -60,7 +73,7 @@ func (a *AuthRoutes) register(ctx *gin.Context) {
 		case errors.Is(err, util.ErrUserAlreadyExists):
 			ctx.JSON(http.StatusConflict, gin.H{"error": err.Error()})
 		default:
-			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err})
+			ctx.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		}
 		return
 	}

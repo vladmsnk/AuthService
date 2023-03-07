@@ -3,7 +3,8 @@ package util
 import "errors"
 
 var (
-	ErrUserNotFound      = errors.New("user not found")
-	ErrInvalidPassword   = errors.New("invalid Password")
-	ErrUserAlreadyExists = errors.New("such user already registered")
+	ErrUserNotFound       = errors.New("user not found")
+	ErrInvalidPassword    = errors.New("invalid Password")
+	ErrUserAlreadyExists  = errors.New("such user already registered")
+	ErrInvalidEmailFormat = errors.New("email format is not valid")
 )
