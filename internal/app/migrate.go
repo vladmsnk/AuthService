@@ -4,10 +4,10 @@ package app
 
 import (
 	"errors"
+	"github.com/golang-migrate/migrate/v4"
 	"log"
 	"os"
 	"time"
-
 	// migrate tools
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
