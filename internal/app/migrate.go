@@ -24,14 +24,11 @@ func init() {
 		log.Fatalf("migrate: environment variable not declared: PG_URL")
 	}
 
-	databaseURL += "?sslmode=disable"
-
 	var (
 		attempts = _defaultAttempts
 		err      error
 		m        *migrate.Migrate
 	)
-
 	for attempts > 0 {
 		m, err = migrate.New("file://migrations", databaseURL)
 		if err == nil {

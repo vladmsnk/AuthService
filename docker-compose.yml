@@ -13,11 +13,11 @@ services:
     ports:
       - 5432:5432
   app:
-    build: .
-    container_name: app
-    image: app
+    build:
+      dockerfile: Dockerfile
+      context: .
     environment:
-      PG_URL: 'postgres://user:pass@postgres:5432/postgres'
+      PG_URL: 'postgres://user:pass@postgres:5432/postgres?sslmode=disable'
     ports:
       - 8080:8080
     depends_on:
