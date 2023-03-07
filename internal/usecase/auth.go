@@ -1,0 +1,62 @@
+package usecase
+
+import (
+	"auth/vladmsnk/internal/dto"
+	"auth/vladmsnk/internal/util"
+	"context"
+	"github.com/google/uuid"
+)
+
+type AuthUseCase struct {
+	authRepo AuthRepo
+}
+
+func NewAuthUseCase(ar AuthRepo) *AuthUseCase {
+	return &AuthUseCase{
+		authRepo: ar,
+	}
+}
+
+func (uc *AuthUseCase) CreateUser(ctx context.Context,
+	request dto.UserRegisterRequest) (dto.UserRegisterResponse, error) {
+
+	_, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
+	if err != nil {
+		return dto.UserRegisterResponse{}, err
+	}
+
+	userID := uuid.New()
+	hashedPassword, err := util.HashPassword(request.Password)
+	if err != nil {
+		return dto.UserRegisterResponse{}, err
+	}
+
+	userEntity := request.FromDTO(userID, hashedPassword)
+
+	_, err = uc.authRepo.SaveUser(ctx, userEntity)
+	if err != nil {
+		return dto.UserRegisterResponse{}, err
+	}
+
+	return userEntity.ToDTO(), nil
+
+}
+
+func (uc *AuthUseCase) GenerateToken(ctx context.Context, request dto.UserLoginRequest) (dto.UserLoginResponse, error) {
+	user, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
+	if err != nil {
+		return dto.UserLoginResponse{}, err
+	}
+
+	credErr := util.CheckPassword(user.PasswordHash, request.Password)
+	if credErr != nil {
+		return dto.UserLoginResponse{}, credErr
+	}
+
+	tokenString, err := util.GenerateJWT(user.Email, user.Username)
+	if err != nil {
+		return dto.UserLoginResponse{}, err
+	}
+
+	return dto.UserLoginResponse{Token: tokenString}, nil
+}
