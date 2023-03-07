@@ -1,6 +1,7 @@
 package util
 
 import (
+	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -18,7 +19,8 @@ func GenerateJWT(email, username string) (string, error) {
 	claims := JWTClaim{Username: username, Email: email,
 		StandardClaims: jwt.StandardClaims{ExpiresAt: expTime.Unix()}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	tokenString, err := token.SignedString(jwtKey)
+	fmt.Println(token)
+	tokenString, err := token.SignedString([]byte(jwtKey))
 	if err != nil {
 		return "", err
 	}

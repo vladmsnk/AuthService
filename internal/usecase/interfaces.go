@@ -4,7 +4,7 @@ import (
 	"auth/vladmsnk/internal/dto"
 	"auth/vladmsnk/internal/entity"
 	"context"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 type (

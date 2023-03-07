@@ -4,7 +4,7 @@ import (
 	"auth/vladmsnk/internal/entity"
 	"auth/vladmsnk/pkg/postgres"
 	"context"
-	"github.com/gofrs/uuid"
+	"github.com/google/uuid"
 )
 
 type Repository struct {
@@ -17,7 +17,7 @@ func New(pg *postgres.Postgres) *Repository {
 }
 
 func (r *Repository) SaveUser(ctx context.Context, user entity.User) (uuid.UUID, error) {
-	_, err := r.Pool.Exec(ctx, InsertUser, user)
+	_, err := r.Pool.Exec(ctx, InsertUser, user.Id, user.Username, user.Email, user.PasswordHash, user.Number)
 	if err != nil {
 		return uuid.UUID{}, err
 	}
@@ -27,7 +27,7 @@ func (r *Repository) SaveUser(ctx context.Context, user entity.User) (uuid.UUID,
 func (r *Repository) FindUserUserByEmail(ctx context.Context, email string) (entity.User, error) {
 	var user entity.User
 
-	err := r.Pool.QueryRow(ctx, FindUserByEmail, email).Scan(&user)
+	err := r.Pool.QueryRow(ctx, FindUserByEmail, email).Scan(&user.Id, &user.Username, &user.Email, &user.PasswordHash, &user.Number)
 	if err != nil {
 		return entity.User{}, err
 	}

@@ -5,6 +5,7 @@ import (
 	"auth/vladmsnk/internal/util"
 	"context"
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v4"
 )
 
 type AuthUseCase struct {
@@ -21,7 +22,7 @@ func (uc *AuthUseCase) CreateUser(ctx context.Context,
 	request dto.UserRegisterRequest) (dto.UserRegisterResponse, error) {
 
 	_, err := uc.authRepo.FindUserUserByEmail(ctx, request.Email)
-	if err != nil {
+	if err != nil && err != pgx.ErrNoRows {
 		return dto.UserRegisterResponse{}, err
 	}
 
@@ -38,7 +39,7 @@ func (uc *AuthUseCase) CreateUser(ctx context.Context,
 		return dto.UserRegisterResponse{}, err
 	}
 
-	return userEntity.ToDTO(), nil
+	return dto.ToDTO(userEntity), nil
 
 }
 
@@ -47,12 +48,10 @@ func (uc *AuthUseCase) GenerateToken(ctx context.Context, request dto.UserLoginR
 	if err != nil {
 		return dto.UserLoginResponse{}, err
 	}
-
-	credErr := util.CheckPassword(user.PasswordHash, request.Password)
+	credErr := util.CheckPassword(request.Password, user.PasswordHash)
 	if credErr != nil {
 		return dto.UserLoginResponse{}, credErr
 	}
-
 	tokenString, err := util.GenerateJWT(user.Email, user.Username)
 	if err != nil {
 		return dto.UserLoginResponse{}, err

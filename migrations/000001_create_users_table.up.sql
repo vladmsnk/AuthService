@@ -1,0 +1,7 @@
+CREATE TABLE IF NOT EXISTS users(
+    id uuid PRIMARY KEY ,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password VARCHAR(2048),
+    number VARCHAR(255) UNIQUE NOT NULL
+);
