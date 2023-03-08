@@ -28,7 +28,7 @@ func ValidateToken(token, signingKey string) error {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, ErrUnexpectedSigningAlgorithm
 		}
-		return signingKey, nil
+		return []byte(signingKey), nil
 	})
 	if err != nil {
 		return err

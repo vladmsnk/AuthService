@@ -9,5 +9,5 @@ type GreetUseCase struct {
 }
 
 func (gu *GreetUseCase) Greet(ctx context.Context) (dto.GreetResponse, error) {
-	return dto.GreetResponse{Greeting: ""}, nil
+	return dto.GreetResponse{Greeting: "You have access to API!"}, nil
 }
