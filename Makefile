@@ -7,7 +7,7 @@ compose-down:
 .PHONY: compose-down
 
 docker-rm-volume:
-	docker volume rm pg-data
+	docker volume rm authservice_pg-data
 .PHONY: docker-rm-volume
 
 test:
