@@ -7,6 +7,8 @@ import (
 	"github.com/google/uuid"
 )
 
+//go:generate mockgen -destination=../mocks/mock_auth_repo.go -package=../mocks
+
 type (
 	Auth interface {
 		CreateUser(ctx context.Context, request dto.UserRegisterRequest) (dto.UserRegisterResponse, error)
@@ -14,7 +16,8 @@ type (
 	}
 
 	AuthRepo interface {
-		SaveUser(ctx context.Context, user entity.User) (uuid.UUID, error)
-		FindUserUserByEmail(ctx context.Context, email string) (entity.User, bool, error)
+		SaveUser(ctx context.Context, user *entity.User) (uuid.UUID, error)
+		FindUserUserByEmail(ctx context.Context, email string) (*entity.User, error)
+		FindUserUserByUsernameAndPassword(ctx context.Context, username, password string) (*entity.User, error)
 	}
 )

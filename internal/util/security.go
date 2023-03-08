@@ -1,19 +1,16 @@
 package util
 
-import "golang.org/x/crypto/bcrypt"
+import (
+	"crypto/sha1"
 
-func HashPassword(password string) (string, error) {
-	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 12)
-	if err != nil {
-		return "", err
-	}
-	return string(bytes), nil
-}
+	"fmt"
+)
 
-func CheckPassword(providedPassword, existingHash string) error {
-	err := bcrypt.CompareHashAndPassword([]byte(existingHash), []byte(providedPassword))
-	if err != nil {
-		return err
-	}
-	return nil
+func HashPassword(password, hashSalt string) string {
+
+	hs := sha1.New()
+	hs.Write([]byte(password))
+	hs.Write([]byte(hashSalt))
+
+	return fmt.Sprintf("%x", hs.Sum(nil))
 }

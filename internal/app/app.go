@@ -13,6 +13,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 )
 
 func Run(cfg *config.Config) {
@@ -24,11 +25,14 @@ func Run(cfg *config.Config) {
 	}
 	defer pg.Close()
 
-	authUseCase := usecase.NewAuthUseCase(repository.New(pg))
+	authUseCase := usecase.NewAuthUseCase(repository.New(pg), cfg.Auth)
 
 	handler := gin.New()
 	v1.NewRouter(handler, lg, authUseCase)
-	server := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port))
+	server := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port),
+		httpserver.ReadTimeout(time.Duration(cfg.HTTP.ReadTimeout)),
+		httpserver.WriteTimeout(time.Duration(cfg.HTTP.WriteTimeout)),
+		httpserver.ShutdownTimeout(time.Duration(cfg.HTTP.ShutdownTimeout)))
 
 	interrupt := make(chan os.Signal, 1)
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)

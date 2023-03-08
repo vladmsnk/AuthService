@@ -10,6 +10,7 @@ type (
 	Config struct {
 		App  `yaml:"app"`
 		HTTP `yaml:"http"`
+		Auth `yaml:"auth"`
 		Log  `yaml:"logger"`
 		PG   `yaml:"postgres"`
 	}
@@ -22,7 +23,17 @@ type (
 
 	// HTTP -.
 	HTTP struct {
-		Port string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		Port            string `env-required:"true" yaml:"port" env:"HTTP_PORT"`
+		ReadTimeout     int    `env-required:"true" yaml:"read_timeout" env:"READ_TIMEOUT"`
+		WriteTimeout    int    `env-required:"true" yaml:"write_timeout" env:"WRITE_TIMEOUT"`
+		ShutdownTimeout int    `env-required:"true" yaml:"shutdown_timeout" env:"SHUTDOWN_TIMEOUT"`
+	}
+
+	// Auth -.
+	Auth struct {
+		SigningKey string `env-required:"true" yaml:"signing_key" env:"SIGNING_KEY"`
+		HashSalt   string `env-required:"true" yaml:"hash_salt" env:"HASH_SALT"`
+		TokenTTL   int    `env-required:"true" yaml:"token_ttl" env:"TOKEN_TTL"`
 	}
 
 	// Log -.

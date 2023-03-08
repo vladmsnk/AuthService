@@ -18,20 +18,20 @@ func Port(port string) Option {
 // ReadTimeout -.
 func ReadTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.server.ReadTimeout = timeout
+		s.server.ReadTimeout = timeout * time.Second
 	}
 }
 
 // WriteTimeout -.
 func WriteTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.server.WriteTimeout = timeout
+		s.server.WriteTimeout = timeout * time.Second
 	}
 }
 
 // ShutdownTimeout -.
 func ShutdownTimeout(timeout time.Duration) Option {
 	return func(s *Server) {
-		s.shutdownTimeout = timeout
+		s.shutdownTimeout = timeout * time.Second
 	}
 }

@@ -4,6 +4,14 @@ app:
 
 http:
   port: '8080'
+  read_timeout: 15
+  write_timeout: 15
+  shutdown_timeout: 15
+
+auth:
+  signing_key: "secret"
+  hash_salt: "sugar"
+  token_ttl: 20000
 
 logger:
   log_level: 'debug'

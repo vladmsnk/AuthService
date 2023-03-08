@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func Auth() gin.HandlerFunc {
+func Auth(signingKey string) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		tokenString := context.GetHeader("Authorization")
 		if tokenString == "" {
@@ -14,7 +14,7 @@ func Auth() gin.HandlerFunc {
 			context.Abort()
 			return
 		}
-		err := util.ValidateToken(tokenString)
+		err := util.ValidateToken(tokenString, signingKey)
 		if err != nil {
 			context.JSON(http.StatusForbidden, gin.H{"error": err.Error()})
 			context.Abort()

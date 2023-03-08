@@ -1,7 +1,6 @@
 package util
 
 import (
-	"fmt"
 	"github.com/dgrijalva/jwt-go"
 	"time"
 )
@@ -12,39 +11,36 @@ type JWTClaim struct {
 	jwt.StandardClaims
 }
 
-const jwtKey = "secret"
-
-func GenerateJWT(email, username string) (string, error) {
-	expTime := time.Now().Add(30 * time.Minute)
-	claims := JWTClaim{Username: username, Email: email,
-		StandardClaims: jwt.StandardClaims{ExpiresAt: expTime.Unix()}}
+func GenerateJWT(email, username, signingKey string, timeToLive int) (string, error) {
+	expTime := time.Now().Add(time.Duration(timeToLive) * time.Second)
+	claims := JWTClaim{Username: username, Email: email, StandardClaims: jwt.StandardClaims{ExpiresAt: expTime.Unix()}}
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-	fmt.Println(token)
-	tokenString, err := token.SignedString([]byte(jwtKey))
+	tokenString, err := token.SignedString([]byte(signingKey))
 	if err != nil {
 		return "", err
 	}
 	return tokenString, nil
 }
 
-func ValidateToken(token string) error {
-	parsedToken, err := jwt.ParseWithClaims(
-		token,
-		&JWTClaim{},
-		func(token *jwt.Token) (interface{}, error) {
-			return []byte(jwtKey), nil
-		},
-	)
+func ValidateToken(token, signingKey string) error {
+
+	parsedTkn, err := jwt.ParseWithClaims(token, &JWTClaim{}, func(token *jwt.Token) (interface{}, error) {
+		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
+			return nil, ErrUnexpectedSigningAlgorithm
+		}
+		return signingKey, nil
+	})
 	if err != nil {
 		return err
 	}
-	claims, ok := parsedToken.Claims.(*JWTClaim)
-	if !ok {
-		return err
+
+	claims, ok := parsedTkn.Claims.(*JWTClaim)
+	if !ok || !parsedTkn.Valid {
+		return ErrInvalidAccessToken
 	}
 
 	if claims.ExpiresAt < time.Now().Local().Unix() {
-		return err
+		return ErrExpiredToken
 	}
 	return nil
 }
