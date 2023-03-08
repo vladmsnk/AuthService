@@ -10,6 +10,10 @@ docker-rm-volume:
 	docker volume rm pg-data
 .PHONY: docker-rm-volume
 
+test:
+	go test -v -cover -race ./internal/...
+.PHONY: test
+
 linter-golangci:
 	golangci-lint run
 .PHONY: linter-golangci

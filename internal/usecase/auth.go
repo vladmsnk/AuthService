@@ -3,17 +3,18 @@ package usecase
 import (
 	"auth/vladmsnk/config"
 	"auth/vladmsnk/internal/dto"
+	"auth/vladmsnk/internal/repository"
 	"auth/vladmsnk/internal/util"
 	"context"
 	"github.com/google/uuid"
 )
 
 type AuthUseCase struct {
-	authRepo AuthRepo
+	authRepo repository.AuthRepo
 	cfg      config.Auth
 }
 
-func NewAuthUseCase(ar AuthRepo, authCfg config.Auth) *AuthUseCase {
+func NewAuthUseCase(ar repository.AuthRepo, authCfg config.Auth) *AuthUseCase {
 	return &AuthUseCase{
 		authRepo: ar,
 		cfg:      authCfg,
@@ -36,6 +37,7 @@ func (uc *AuthUseCase) CreateUser(ctx context.Context,
 	hashedPassword := util.HashPassword(request.Password, uc.cfg.HashSalt)
 
 	userEntity := request.FromDTO(userID, hashedPassword)
+
 	_, err = uc.authRepo.SaveUser(ctx, &userEntity)
 	if err != nil {
 		return dto.UserRegisterResponse{}, err
