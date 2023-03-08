@@ -15,18 +15,15 @@ func Auth(signingKey string) gin.HandlerFunc {
 			context.Abort()
 			return
 		}
-
 		headerSplitted := strings.Split(authHeader, " ")
 		if len(headerSplitted) != 2 {
 			context.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-
 		if headerSplitted[0] != "Bearer" {
 			context.AbortWithStatus(http.StatusBadRequest)
 			return
 		}
-
 		err := util.ValidateToken(headerSplitted[1], signingKey)
 		if err != nil {
 			context.JSON(http.StatusUnauthorized, gin.H{"error": err.Error()})

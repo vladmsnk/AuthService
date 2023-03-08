@@ -31,7 +31,7 @@ func ValidateToken(token, signingKey string) error {
 		return []byte(signingKey), nil
 	})
 	if err != nil {
-		return err
+		return ErrInvalidAccessToken
 	}
 
 	claims, ok := parsedTkn.Claims.(*JWTClaim)

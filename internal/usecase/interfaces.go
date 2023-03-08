@@ -7,11 +7,9 @@ import (
 	"github.com/google/uuid"
 )
 
-//go:generate mockgen -destination=../mocks/mock_auth_repo.go -package=../mocks
-
 type (
 	Greet interface {
-		Greet(ctx context.Context) (dto.GreetResponse, error)
+		Greet(_ context.Context) (dto.GreetResponse, error)
 	}
 
 	Auth interface {
