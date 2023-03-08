@@ -10,6 +10,10 @@ import (
 //go:generate mockgen -destination=../mocks/mock_auth_repo.go -package=../mocks
 
 type (
+	Greet interface {
+		Greet(ctx context.Context) (dto.GreetResponse, error)
+	}
+
 	Auth interface {
 		CreateUser(ctx context.Context, request dto.UserRegisterRequest) (dto.UserRegisterResponse, error)
 		GenerateToken(ctx context.Context, request dto.UserLoginRequest) (dto.UserLoginResponse, error)

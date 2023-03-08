@@ -6,12 +6,13 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func NewRouter(handler *gin.Engine, l logger.Interface, a usecase.Auth) {
+func NewRouter(handler *gin.Engine, l logger.Interface, a usecase.Auth, b usecase.Greet, signingKey string) {
 	handler.Use(gin.Logger())
 	handler.Use(gin.Recovery())
 
 	api := handler.Group("/")
 	{
 		newAuthRoutes(api, a, l)
+		newGreetRoutes(api, b, l, signingKey)
 	}
 }

@@ -26,9 +26,11 @@ func Run(cfg *config.Config) {
 	defer pg.Close()
 
 	authUseCase := usecase.NewAuthUseCase(repository.New(pg), cfg.Auth)
+	greetUseCase := new(usecase.GreetUseCase)
 
 	handler := gin.New()
-	v1.NewRouter(handler, lg, authUseCase)
+	v1.NewRouter(handler, lg, authUseCase, greetUseCase, cfg.Auth.SigningKey)
+
 	server := httpserver.New(handler, httpserver.Port(cfg.HTTP.Port),
 		httpserver.ReadTimeout(time.Duration(cfg.HTTP.ReadTimeout)),
 		httpserver.WriteTimeout(time.Duration(cfg.HTTP.WriteTimeout)),
@@ -38,8 +40,8 @@ func Run(cfg *config.Config) {
 	signal.Notify(interrupt, os.Interrupt, syscall.SIGTERM)
 
 	select {
-	case s := <-interrupt:
-		lg.Info("app - Run - signal: " + s.String())
+	case sig := <-interrupt:
+		lg.Info("app - Run - signal: " + sig.String())
 	case err = <-server.Notify():
 		lg.Error(fmt.Errorf("app - Run - server.Notify: %w", err))
 	}
