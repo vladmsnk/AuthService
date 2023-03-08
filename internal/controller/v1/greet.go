@@ -13,6 +13,7 @@ type GreetRoutes struct {
 	l logger.Interface
 }
 
+// newGreetRoutes
 func newGreetRoutes(api *gin.RouterGroup, g usecase.Greet, l logger.Interface, signingKey string) {
 	r := &GreetRoutes{g, l}
 

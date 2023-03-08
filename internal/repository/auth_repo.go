@@ -13,11 +13,12 @@ type Repository struct {
 	*postgres.Postgres
 }
 
-// New -.
+// New Create new instance of repo
 func New(pg *postgres.Postgres) *Repository {
 	return &Repository{pg}
 }
 
+// SaveUser Save new user in database
 func (r *Repository) SaveUser(ctx context.Context, user *entity.User) (uuid.UUID, error) {
 	_, err := r.Pool.Exec(ctx, InsertUser, user.Id, user.Username, user.Email, user.PasswordHash, user.Number)
 	if err != nil {
@@ -26,6 +27,7 @@ func (r *Repository) SaveUser(ctx context.Context, user *entity.User) (uuid.UUID
 	return user.Id, nil
 }
 
+// FindUserUserByEmail find user by email, returning not nil user entity if found
 func (r *Repository) FindUserUserByEmail(ctx context.Context, email string) (*entity.User, error) {
 	user := new(entity.User)
 
@@ -41,6 +43,7 @@ func (r *Repository) FindUserUserByEmail(ctx context.Context, email string) (*en
 	return user, nil
 }
 
+// FindUserUserByUsernameAndPassword find user by username and password hash, returning not nil user entity if found
 func (r *Repository) FindUserUserByUsernameAndPassword(ctx context.Context, username, password string) (*entity.User, error) {
 	user := new(entity.User)
 

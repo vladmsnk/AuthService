@@ -22,7 +22,7 @@ func newAuthRoutes(handler *gin.RouterGroup, a usecase.Auth, l logger.Interface)
 	handler.POST("/user/register", r.register)
 }
 
-//login endpoint
+// login endpoint
 func (a *AuthRoutes) login(ctx *gin.Context) {
 	var userLoginRequest dto.UserLoginRequest
 
@@ -48,7 +48,7 @@ func (a *AuthRoutes) login(ctx *gin.Context) {
 	ctx.JSON(http.StatusOK, response)
 }
 
-//registration endpoint
+// register registration endpoint
 func (a *AuthRoutes) register(ctx *gin.Context) {
 	var userRegisterRequest dto.UserRegisterRequest
 

@@ -7,6 +7,7 @@ import (
 	"strings"
 )
 
+// Auth middleware filter for API http requests
 func Auth(signingKey string) gin.HandlerFunc {
 	return func(context *gin.Context) {
 		authHeader := context.GetHeader("Authorization")

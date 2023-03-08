@@ -14,6 +14,7 @@ type AuthUseCase struct {
 	cfg      config.Auth
 }
 
+// NewAuthUseCase Creates AuthUseCase instance
 func NewAuthUseCase(ar repository.AuthRepo, authCfg config.Auth) *AuthUseCase {
 	return &AuthUseCase{
 		authRepo: ar,
@@ -21,6 +22,7 @@ func NewAuthUseCase(ar repository.AuthRepo, authCfg config.Auth) *AuthUseCase {
 	}
 }
 
+// CreateUser Saves a new user if he does not already exist and a provided email is correct
 func (uc *AuthUseCase) CreateUser(ctx context.Context,
 	request dto.UserRegisterRequest) (dto.UserRegisterResponse, error) {
 
@@ -47,6 +49,7 @@ func (uc *AuthUseCase) CreateUser(ctx context.Context,
 
 }
 
+// GenerateToken Generates jwt token if user exists and password is correct
 func (uc *AuthUseCase) GenerateToken(ctx context.Context, request dto.UserLoginRequest) (dto.UserLoginResponse, error) {
 	hashedPassword := util.HashPassword(request.Password, uc.cfg.HashSalt)
 

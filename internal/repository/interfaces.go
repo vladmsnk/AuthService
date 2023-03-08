@@ -6,6 +6,7 @@ import (
 	"github.com/google/uuid"
 )
 
+// AuthRepo interface, it could be implemented differently for several
 type AuthRepo interface {
 	SaveUser(ctx context.Context, user *entity.User) (uuid.UUID, error)
 	FindUserUserByEmail(ctx context.Context, email string) (*entity.User, error)
