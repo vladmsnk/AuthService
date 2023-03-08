@@ -31,6 +31,7 @@ Example input:
 }
 ```
 **GET http://localhost:8080/login**
+
 Login an existing user and givin jwt token back
 
 Example input:
@@ -48,3 +49,13 @@ Example output:
 }
 ```
 
+**GET http://localhost:8080/api/v1/greet**
+
+Bearer token required in Authorization headers
+
+Example output for valid token:
+```
+{
+    "greeting": "You have access to API!"
+}
+```
